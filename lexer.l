@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+#include "lexmessage.hpp"
+
 using std::cout;
 using std::endl;
 
@@ -25,6 +27,8 @@ NOT             [Nn][Oo][Tt]
 PRINT           [Pp][Rr][Ii][Nn][Tt]
 PRINTLN         [Pp][Rr][Ii][Nn][Tt][Ll][Nn]
 
+%x              HYPHEN_COMMENT
+
 
 TRUE            [t][r][u][e]
 FALSE           [f][a][l][s][e]
@@ -34,20 +38,24 @@ FALSE           [f][a][l][s][e]
 {WS}                /* skip blanks and tabs */
 
 "+"|"-"|"*"|"/"|"="|">="|">"|"<="|"<"|"=="|"!="|"|" {
-    cout << "Token class: OP, Token value: " << yytext << endl;
+    PrintMessage("OP", yytext);
 }
 
 {ELSE}|{FALSE}|{IF}|{LOOP}|{THEN}|{WHILE}|{NOT}|{TRUE}|{PRINT}|{PRINTLN} {
-    cout << "Token class: KEYWORD, Token value: " << yytext << endl;
+    PrintMessage("KEYWORD", yytext);
 }
 
-{NUMBER}            { cout << "Token class: NUMBER, Token value: " << yytext << endl; }
+{NUMBER}            { PrintMessage("NUMBER", yytext); }
 
-{VAR}               { cout << "Token class: ID, Token value: " << yytext << endl; }
+{VAR}               { PrintMessage("ID", yytext); }
 
-{ID_TYPE}           { cout << "Token class: TYPE_ID, Token value: " << yytext << endl; }
+{ID_TYPE}           { PrintMessage("TYPE_ID", yytext); }
 
-{STRING}            { cout << "Token class: STRING, Token value: " << yytext << endl; }
+{STRING}            { 
+        yytext++;
+        yytext[strlen(yytext) - 1] = '\0';
+        PrintMessage("STRING", yytext); 
+}
 
 "("                {     
     char symbol = 0;
@@ -83,16 +91,15 @@ FALSE           [f][a][l][s][e]
 }
 
 "--"        {
-    char symbol = yyinput();
-    
-    cout << "Token class: OPEN_COMMENT" << endl;
+    BEGIN(HYPHEN_COMMENT);
+}
 
-    while (symbol != '\n' && symbol != '\0') 
-    {
-        symbol = yyinput();
-    }
-    
-    cout << "Token class: CLOSE_COMMENT" << endl;
+<HYPHEN_COMMENT>{
+    [^<<EOF>>\n]+
+
+    <<EOF>>  BEGIN(INITIAL);
+
+    \n    BEGIN(INITIAL);
 }
 
 .   { cout << "UNKNOWN " << yytext << endl; }

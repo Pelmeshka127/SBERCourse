@@ -6,7 +6,7 @@ find_package(FLEX REQUIRED)
 
 flex_target(lexer lexer.l ${CMAKE_CURRENT_BINARY_DIR}/lexer.cc)
 
-add_executable(stasyan main.cpp ${FLEX_lexer_OUTPUTS})
+add_executable(stasyan main.cpp lexmessage.cpp ${FLEX_lexer_OUTPUTS})
 
 target_compile_features(stasyan PRIVATE cxx_std_20)
 

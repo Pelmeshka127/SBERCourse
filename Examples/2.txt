@@ -1,2 +1,3 @@
 Int64_t position = if true then initial + rate * 60 else 0
 (FIXME: тут считается неправильно (кринж)) 
+string = "string"
