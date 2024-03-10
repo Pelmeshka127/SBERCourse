@@ -5,8 +5,6 @@
 #include <string>
 #include <cstring>
 
-#define MAX_STRING_LENGTH 255
-
 //====================================================================================================//
 
 void PrintMessage(std::string t_class, std::string t_value);
