@@ -9,6 +9,8 @@
 using std::cout;
 using std::endl;
 
+int comment_count;
+
 %}
 
 WS      [ \t\n\v]+
@@ -27,7 +29,7 @@ NOT             [Nn][Oo][Tt]
 PRINT           [Pp][Rr][Ii][Nn][Tt]
 PRINTLN         [Pp][Rr][Ii][Nn][Tt][Ll][Nn]
 
-%x              HYPHEN_COMMENT
+%x              HYPHEN_COMMENT BRACKET_COMMENT
 
 
 TRUE            [t][r][u][e]
@@ -57,38 +59,8 @@ FALSE           [f][a][l][s][e]
         PrintMessage("STRING", yytext); 
 }
 
-"("                {     
-    char symbol = 0;
-    
-    int comment = 1;
 
-    cout << "Token class: OPEN_COMMENT" << endl;
 
-    while (comment != 0) 
-    {
-        if ((symbol = yyinput()) == '(') 
-        {
-            cout << "Token class: OPEN_COMMENT" << endl;
-            
-            comment++;
-
-            continue;
-        }
-
-        if (symbol == ')') 
-        {
-            cout << "Token class: CLOSE_COMMENT" << endl;
-            
-            comment--;
-            
-            continue;
-        }
-
-        if (symbol == '\0') 
-            cout << "Error" << endl;
-
-    }
-}
 
 "--"        {
     BEGIN(HYPHEN_COMMENT);
@@ -101,6 +73,32 @@ FALSE           [f][a][l][s][e]
 
     \n    BEGIN(INITIAL);
 }
+
+
+
+
+"("             {
+    comment_count = 1;        
+    BEGIN(BRACKET_COMMENT);
+}
+
+<BRACKET_COMMENT>{
+
+"("    comment_count++;
+    
+")"                     {
+    comment_count--;
+
+    if (comment_count == 0) {
+        BEGIN(INITIAL);
+    }
+}
+
+[^)]
+
+}
+
+
 
 .   { cout << "UNKNOWN " << yytext << endl; }
 
