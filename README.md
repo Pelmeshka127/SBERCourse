@@ -21,5 +21,5 @@ cd build
 
 make
 
-./stasyan 
+./stasyan ../Examples/1.txt
 ```
